@@ -1,0 +1,350 @@
+mkdir music-server & cd music-server
+
+npm init -y(패키지 초기화)
+
+npm i prisma@5.20.0 -D
+
+npm i @prisma/client@5.20.0
+
+npx prisma init
+
+code .
+--------------------------
+.env 파일에서 수정할것!
+DATABASE_URL="file:./dev.db"
+-----------------------
+확장팩에서 prisma 설치할것!
+---------------------------
+schema.prisma에 작성할것
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Song {
+  id Int @id @default(autoincrement())
+  title String
+  artist String
+  genre String
+  createdAt DateTime @default(now())
+}
+--------------
+터미널에서
+npx prisma migrate dev --name init
+
+npm i sqlite3@5.1.7
+
+npm i -D typescript@5.4.5
+
+npx tsc --init  (타입스크립트 초기화)
+
+불필요한거 제거 tsconfig.json파일수정
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "es2016",
+    /* Modules */
+    "module": "commonjs" /* Specify what module code is generated. */,
+
+    "esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */,
+    // "preserveSymlinks": true,                         /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
+    "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
+
+    /* Type Checking */
+    "strict": true /* Enable all strict type-checking options. */,
+
+    // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */
+  },
+  "include": ["src"]
+}
+
+
+
+------------------------------------------------
+npm i apollo-server@3.13.0 graphql@16.9.0
+
+=============================================
+<클라이언트 설정> 프로젝트 구성!
+
+npm create vite@5.2.3 music-client -- --template react-ts
+
+cd music-client
+
+code .
+--------------------------------------------
+터미널에서
+npm install
+------------------------------------------------
+pages containers presentionals 폴더 만들기!
+
+
+=====================================
+
+music-server에 터미널에서
+
+npm i -D esbuild@0.20.2
+
+npm i -D nodemon@3.1.4
+
+--------------------------------------------------
+npm i -g pnpm@9.7.1
+(강사컴터는그랬음-관리자버전으로 실행해야함 sudo)
+
+nodemodules, package.lock.json 삭제 후
+
+pnpm install(터미널에서)
+
+====================================
+
+(클라이언트에서도 마찬가지)
+npm i -g pnpm@9.7.1
+(강사컴터는그랬음-관리자버전으로 실행해야함 sudo)
+
+nodemodules, package.lock.json 삭제 후
+
+pnpm install(터미널에서)
+
+===================================
+pnpm dev
+
+
+
+
+====================================
+<모노레프로 통합-공통파일만드는과정>
+새로 cmd 열고 클라이언트와 서버를 함께 관리 할 수 있는 프로젝트 생성
+mkdir music-app && cd music-app 
+
+pnpm init
+
+mkdir packages
+
+move ../music-client packages
+move ../music-server packages
+
+code .
+
+pnpm-workspace.yaml 파일 만들어서
+
+pnpm install (workspace를 만들어야함)
+
+pnpm --filter=music-server dev
+
+pnpm --filter=music-client i -D tailwindcss@3.4.3 postcss@8.4.39 autoprefixer@10.4.9
+
+cd packages/music-client
+
+pnpm tailwindcss init -p
+
+tailwind.config.js파일에서 
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./index.html", "src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+
+index.css파일에서 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  display: flex;
+  min-height: 100vh;
+}
+
+pnpm --filter=music-client dev
+
+pnpm i @tanstack/react-query@5.29.2 graphql@16.8.1 graphql-request@7.1.0
+
+.env.local파일만든후,
+VITE_API_HOST=http://localhost:4000
+
+vite-env.d.ts파일에 
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  VITE_API_HOST: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
+graphqlClient.ts파일에 
+import { GraphQLClient } from "graphql-request";
+
+const endpoint = import.meta.env.VITE_API_HOST;
+
+export const graphqlClient = new GraphQLClient(endpoint);
+
+tsconfig.json파일에 linting 밑에 작성하기
+/* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+
+vite.config.ts파일에 
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": "/src",
+    },
+  },
+});
+=============================================================
+<api 모킹하는과정(msw)>
+cd ../..
+pnpm i --filter=music-client -D msw@2.2.13
+src폴더밑에 __mock__폴더밑에 handler.ts파일, browser.ts파일만들기
+================================
+music client에서
+C:\Users\902-24\music-app\packages\music-client>pnpm msw init public --save
+===================================
+music-app에서
+pnpm i --filter "*client" react-error-boundary@4.0.13
+
+
+pnpm i --filter "*client" dev
+
+==============================
+C:\Users\902-24\music-app>cd packages/music-server
+music-server에서
+
+npx prisma migrate dev --name add_album_to_song
+
+npx prisma studio
+=======================
+music-server src에서 resolvers.ts 파일 만들고, schema.ts 파일을 typeDefs.ts로 이름변경하기
+=================================
+music-app에서
+pnpm --filter "*-server" dev
+===========================
+
+C:\Users\902-24\music-app>pnpm --filter "*-client" dev
+
+pnpm --filter "*-client" i tailwindcss-merge@2.5.3 
+
+pnpm --filter "*-client" i -D vite-plugin-svgr@4.2.0
+
+vite.config.ts파일에서
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import svgr from "vite-plugin-svgr";
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react(), svgr()],
+  resolve: {
+    alias: {
+      "@": "/src",
+    },
+  },
+});
+
+
+types 폴더에서 global.d.ts파일에서 
+/// <reference types="vite-plugin-svgr/client" />
+
+
+pnpm --filter "*-client" i framer-motion@11.1.7
+
+==================================================
+
+pnpm --filter "*-server" i express@4.19.2 @apollo/server@4.11.0
+
+pnpm --filter "*-server" i cors@2.8.5
+
+pnpm --filter "*-server" i -D @types/cors@2.8.17 @types/express@4.17.21
+
+=================================================
+pnpm --filter "*-server" dev
+
+
+pnpm --filter "*-client" i zustand@4.5.4
+======================================
+
+pnpm prisma migrate dev --name add_fields_to_song
+
+pnpm prisma studio
+
+pnpm prisma migrate dev --name remove_optional_fields
+
+
+cd packages/music-client
+pnpm tsc(타입스크립트 에러 확인)
+
+
+cd ../..
+pnpm --filter "*-server" dev
+
+
+pnpm --filter "*-client" i react-beautiful-dnd
+pnpm --filter "*-client" i -D @types/react-beautiful-dnd
+
+
+pnpm --filter "*-client" dev
+===================================================
+pnpm prisma migrate dev --name add_mix_maker(music-server에서)
+
+pnpm prisma generate
+
+
+music-server에서
+pnpm prisma migrate dev --name add_tags
+pnpm prisma generate
+
+
+pnpm i --filter "*server" openai@4.65.0
+
+============================================
+
+docker -v
+
+cd packages/music-server
+
+docker build -t ai-music-app:latest .
+
+docker build --no-cache -t ai-music-app:latest .
+
+docker build --build-arg NODE_ENV=production -t ai-music-app:latest .
+
+docker images
+==============================================
+dockerfile에 작성하기
+RUN apt-get update -y && apt-get install -y openssl
+#이 한줄 추가 후 docker build -t ai-music-app:latest .
+#이미지 생성 후 docker run ai-music-app
+
+docker run -p 4000:4000 ai-music-app:latest
+(8080도 나쁘지 않음 8080:4000)
+#docker ps
+#dockerexec -it 첫번째아이디 /bin/bash
+#docker stop 첫번째아이디
+#docker ps
+#docker rm 첫번째아이디
+#docker rm $(docker ps -a -q)
+
+도커컨테이너를 gui를 통해서도 가능! docker desktop 버전으로 설치하삼!
+
